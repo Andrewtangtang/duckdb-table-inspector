@@ -7,6 +7,7 @@
 #include "duckdb/catalog/default/default_schemas.hpp"
 #include "duckdb/common/assert.hpp"
 #include "duckdb/common/exception.hpp"
+#include "duckdb/common/string_util.hpp"
 #include "duckdb/function/table_function.hpp"
 #include "duckdb/main/attached_database.hpp"
 #include "duckdb/main/extension/extension_loader.hpp"
@@ -167,7 +168,8 @@ void InspectDatabaseExecute(ClientContext &context, TableFunctionInput &data, Da
 		output.SetValue(DATABASE_NAME_IDX, count, Value(entry.database_name));
 		output.SetValue(SCHEMA_NAME_IDX, count, Value(entry.schema_name));
 		output.SetValue(TABLE_NAME_IDX, count, Value(entry.table_name));
-		output.SetValue(DATA_SIZE_IDX, count, Value(FormatSize(entry.persisted_data_size_bytes)));
+		output.SetValue(DATA_SIZE_IDX, count,
+		                Value(StringUtil::BytesToHumanReadableString(entry.persisted_data_size_bytes)));
 
 		state.offset++;
 		count++;
