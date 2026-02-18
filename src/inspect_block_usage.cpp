@@ -6,7 +6,6 @@
 #include "duckdb/catalog/catalog_entry/table_catalog_entry.hpp"
 #include "duckdb/catalog/default/default_schemas.hpp"
 #include "duckdb/common/assert.hpp"
-#include "duckdb/common/string_util.hpp"
 #include "duckdb/function/table_function.hpp"
 #include "duckdb/main/extension/extension_loader.hpp"
 #include "duckdb/storage/database_size.hpp"
@@ -86,8 +85,8 @@ unique_ptr<FunctionData> InspectBlockUsageBindInternal(ClientContext &context, c
 	return_types.reserve(4);
 	names.emplace_back("component");
 	return_types.emplace_back(LogicalType {LogicalTypeId::VARCHAR});
-	names.emplace_back("size");
-	return_types.emplace_back(LogicalType {LogicalTypeId::VARCHAR});
+	names.emplace_back("size_bytes");
+	return_types.emplace_back(LogicalType {LogicalTypeId::BIGINT});
 	names.emplace_back("percentage");
 	return_types.emplace_back(LogicalType {LogicalTypeId::VARCHAR});
 	names.emplace_back("block_count");
@@ -203,7 +202,7 @@ void InspectBlockUsageExecute(ClientContext &context, TableFunctionInput &data, 
 		auto &entry = state.entries[state.offset];
 
 		output.SetValue(COMPONENT_IDX, count, Value(entry.component));
-		output.SetValue(SIZE_IDX, count, Value(StringUtil::BytesToHumanReadableString(entry.size_bytes)));
+		output.SetValue(SIZE_IDX, count, Value::BIGINT(NumericCast<int64_t>(entry.size_bytes)));
 		output.SetValue(PERCENTAGE_IDX, count, Value(entry.percentage));
 		output.SetValue(BLOCK_COUNT_IDX, count, Value::BIGINT(NumericCast<int64_t>(entry.block_count)));
 
