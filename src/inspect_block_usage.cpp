@@ -6,6 +6,7 @@
 #include "duckdb/catalog/catalog_entry/table_catalog_entry.hpp"
 #include "duckdb/catalog/default/default_schemas.hpp"
 #include "duckdb/common/assert.hpp"
+#include "duckdb/common/string_util.hpp"
 #include "duckdb/function/table_function.hpp"
 #include "duckdb/main/extension/extension_loader.hpp"
 #include "duckdb/storage/database_size.hpp"
@@ -202,7 +203,7 @@ void InspectBlockUsageExecute(ClientContext &context, TableFunctionInput &data, 
 		auto &entry = state.entries[state.offset];
 
 		output.SetValue(COMPONENT_IDX, count, Value(entry.component));
-		output.SetValue(SIZE_IDX, count, Value(FormatSize(entry.size_bytes)));
+		output.SetValue(SIZE_IDX, count, Value(StringUtil::BytesToHumanReadableString(entry.size_bytes)));
 		output.SetValue(PERCENTAGE_IDX, count, Value(entry.percentage));
 		output.SetValue(BLOCK_COUNT_IDX, count, Value::BIGINT(NumericCast<int64_t>(entry.block_count)));
 

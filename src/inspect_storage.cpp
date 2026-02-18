@@ -1,8 +1,8 @@
 #include "inspect_storage.hpp"
-#include "util.hpp"
 
 #include "duckdb/catalog/catalog.hpp"
 #include "duckdb/common/assert.hpp"
+#include "duckdb/common/string_util.hpp"
 #include "duckdb/common/vector.hpp"
 #include "duckdb/function/table_function.hpp"
 #include "duckdb/main/attached_database.hpp"
@@ -87,8 +87,10 @@ void InspectStorageExecute(ClientContext &context, TableFunctionInput &data, Dat
 		auto &entry = state.entries[state.offset];
 
 		output.SetValue(DATABASE_NAME_IDX, count, Value(entry.database_name));
-		output.SetValue(DATABASE_FILE_SIZE_IDX, count, Value(FormatSize(entry.database_file_size_bytes)));
-		output.SetValue(WAL_FILE_SIZE_IDX, count, Value(FormatSize(entry.wal_file_size_bytes)));
+		output.SetValue(DATABASE_FILE_SIZE_IDX, count,
+		                Value(StringUtil::BytesToHumanReadableString(entry.database_file_size_bytes)));
+		output.SetValue(WAL_FILE_SIZE_IDX, count,
+		                Value(StringUtil::BytesToHumanReadableString(entry.wal_file_size_bytes)));
 
 		state.offset++;
 		count++;

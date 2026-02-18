@@ -1,5 +1,4 @@
 #include "inspect_column.hpp"
-#include "util.hpp"
 
 #include "duckdb/catalog/catalog.hpp"
 #include "duckdb/catalog/catalog_entry/table_catalog_entry.hpp"
@@ -241,11 +240,13 @@ void InspectColumnExecute(ClientContext &context, TableFunctionInput &data, Data
 
 		// Total compressed size = main block portion + additional blocks
 		const idx_t total_compressed_size = entry.compressed_size + entry.additional_blocks_size;
-		output.SetValue(COMPRESSED_SIZE_IDX, count, Value(FormatSize(total_compressed_size)));
+		output.SetValue(COMPRESSED_SIZE_IDX, count,
+		                Value(StringUtil::BytesToHumanReadableString(total_compressed_size)));
 
 		const auto estimated_size = CalculateEstimatedDecompressedSize(entry.column_type, entry.row_count);
 		if (estimated_size.IsValid()) {
-			output.SetValue(ESTIMATED_DECOMPRESSED_SIZE_IDX, count, Value(FormatSize(estimated_size.GetIndex())));
+			output.SetValue(ESTIMATED_DECOMPRESSED_SIZE_IDX, count,
+			                Value(StringUtil::BytesToHumanReadableString(estimated_size.GetIndex())));
 		} else {
 			output.SetValue(ESTIMATED_DECOMPRESSED_SIZE_IDX, count, Value("N/A"));
 		}
