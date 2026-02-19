@@ -16,6 +16,10 @@ assignees: ''
 A clear and concise description of what the bug is.
 
 **To Reproduce**
+Steps to reproduce the behavior:
+1. ...
+2. ...
+
 Minimal SQL or code to reproduce the issue:
 ```sql
 -- Example:
