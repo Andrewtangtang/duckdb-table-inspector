@@ -130,7 +130,7 @@ vector<FilteredSegmentEntry> FilterAndCalculateSegments(const vector<ColumnSegme
 
 // Calculate estimated decompressed size
 // For fixed-size types: type_size * row_count
-// For variable-length types: returns invalid optional_idx (will display as "N/A")
+// For variable-length types: returns invalid optional_idx (will be NULL)
 optional_idx CalculateEstimatedDecompressedSize(const LogicalType &type, idx_t row_count) {
 	const PhysicalType physical_type = type.InternalType();
 	if (!TypeIsConstantSize(physical_type)) {
@@ -226,8 +226,8 @@ void InspectColumnExecute(ClientContext &context, TableFunctionInput &data, Data
 	constexpr idx_t COLUMN_NAME_IDX = 1;
 	constexpr idx_t COLUMN_TYPE_IDX = 2;
 	constexpr idx_t COMPRESSION_IDX = 3;
-	constexpr idx_t COMPRESSED_SIZE_IDX = 4;
-	constexpr idx_t ESTIMATED_DECOMPRESSED_SIZE_IDX = 5;
+	constexpr idx_t COMPRESSED_BYTES_IDX = 4;
+	constexpr idx_t ESTIMATED_DECOMPRESSED_BYTES_IDX = 5;
 	constexpr idx_t ROW_COUNT_IDX = 6;
 
 	while (state.offset < bind_data.filtered_segments.size() && count < STANDARD_VECTOR_SIZE) {
@@ -240,14 +240,14 @@ void InspectColumnExecute(ClientContext &context, TableFunctionInput &data, Data
 
 		// Total compressed size = main block portion + additional blocks
 		const idx_t total_compressed_size = entry.compressed_size + entry.additional_blocks_size;
-		output.SetValue(COMPRESSED_SIZE_IDX, count, Value::BIGINT(NumericCast<int64_t>(total_compressed_size)));
+		output.SetValue(COMPRESSED_BYTES_IDX, count, Value::BIGINT(NumericCast<int64_t>(total_compressed_size)));
 
 		const auto estimated_size = CalculateEstimatedDecompressedSize(entry.column_type, entry.row_count);
 		if (estimated_size.IsValid()) {
-			output.SetValue(ESTIMATED_DECOMPRESSED_SIZE_IDX, count,
+			output.SetValue(ESTIMATED_DECOMPRESSED_BYTES_IDX, count,
 			                Value::BIGINT(NumericCast<int64_t>(estimated_size.GetIndex())));
 		} else {
-			output.SetValue(ESTIMATED_DECOMPRESSED_SIZE_IDX, count, Value(LogicalType::BIGINT));
+			output.SetValue(ESTIMATED_DECOMPRESSED_BYTES_IDX, count, Value());
 		}
 
 		output.SetValue(ROW_COUNT_IDX, count, Value::BIGINT(NumericCast<int64_t>(entry.row_count)));

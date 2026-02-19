@@ -194,7 +194,7 @@ void InspectBlockUsageExecute(ClientContext &context, TableFunctionInput &data, 
 	idx_t count = 0;
 
 	constexpr idx_t COMPONENT_IDX = 0;
-	constexpr idx_t SIZE_IDX = 1;
+	constexpr idx_t SIZE_BYTES_IDX = 1;
 	constexpr idx_t PERCENTAGE_IDX = 2;
 	constexpr idx_t BLOCK_COUNT_IDX = 3;
 
@@ -202,7 +202,7 @@ void InspectBlockUsageExecute(ClientContext &context, TableFunctionInput &data, 
 		auto &entry = state.entries[state.offset];
 
 		output.SetValue(COMPONENT_IDX, count, Value(entry.component));
-		output.SetValue(SIZE_IDX, count, Value::BIGINT(NumericCast<int64_t>(entry.size_bytes)));
+		output.SetValue(SIZE_BYTES_IDX, count, Value::BIGINT(NumericCast<int64_t>(entry.size_bytes)));
 		output.SetValue(PERCENTAGE_IDX, count, Value(entry.percentage));
 		output.SetValue(BLOCK_COUNT_IDX, count, Value::BIGINT(NumericCast<int64_t>(entry.block_count)));
 
